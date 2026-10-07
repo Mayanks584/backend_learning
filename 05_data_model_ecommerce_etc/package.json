@@ -1,0 +1,16 @@
+{
+  "name": "pratice",
+  "version": "1.0.0",
+  "description": "data modeleing karege",
+  "license": "ISC",
+  "author": "mayank rana",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "mongoose": "^9.11.0"
+  }
+}
