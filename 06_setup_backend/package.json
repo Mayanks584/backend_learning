@@ -2,6 +2,7 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "a backend at chai code",
+  "type": "module",
   "keywords": [
     "javascript",
     "backend",
@@ -9,9 +10,11 @@
   ],
   "license": "ISC",
   "author": "mayank rana",
-  "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "modemon src/index.js" 
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
   }
 }
