@@ -16,6 +16,24 @@ dotenv.config({
 
 
 connectDB()
+.then(()=>{
+
+    // app. listen se phele error ko bhi listen karna chahte hai 
+
+    app.on("error",(error)=>{
+        console.log("erre",error);
+        throw error
+    })
+    
+    app.listen(process.env.PORT || 8000 , () =>{
+        console.log('server is runing')
+    })
+
+})
+.catch((error)=>{
+    console.log("daild")
+
+})
 
 
 
