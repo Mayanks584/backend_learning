@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema(
         watchHistory:[
 
             {
-                type:Schema.Type.ObjectId,
+                type:mongoose.Schema.Types.ObjectId,
                 ref:"Video"
 
             }
@@ -83,9 +83,9 @@ userSchema.pre("save", async function (next) {
 // there is two way 
 // one method 
     if(this.isModified("password")){
-         this.password = bcrypt.hash(this.password,10)
-    next()
+         this.password = await bcrypt.hash(this.password,10)
     }
+    next()
 
     // now we are checking ki password sahi hai ya nahi hai 
 
@@ -122,9 +122,9 @@ userSchema.methods.generateAccessToken = function (){
         fullname:this.fullname
         // payload : mere database se a rahi hai 
     },
-    process.env.ACCESS_TOKEN_SCRRET,
+    process.env.ACCESS_TOKEN_SECRET,
     {
-        expiresIn: ACCESS_TOKEN_EXPIRY
+        expiresIn: process.env.ACCESS_TOKEN_EXPIRY
     }
 )
 }
@@ -137,7 +137,7 @@ userSchema.methods.generateRefreshToken = function (){
     },
     process.env.REFRESH_TOKEN_SECRET,
     {
-        expiresIn: REFRESH_TOKEN_EXPIRY
+        expiresIn: process.env.REFRESH_TOKEN_EXPIRY
     }
 )
 }

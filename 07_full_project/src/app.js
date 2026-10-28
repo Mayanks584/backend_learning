@@ -28,7 +28,9 @@ app.use(express.json({limit: "20kb"}))
 
 multer se hum file accept karte hai 
 
-when the data is form url  ko comfrig karna padta hai kyu url me bahut ? , % hote hai or vo har ik 
+when the data is form url  ko comfrig karna padta hai kyu url me bahut ? ,
+
+% hote hai or vo har ik 
 
 browser pe alag alag hote hai to uko confrig karne ka trika 
 
