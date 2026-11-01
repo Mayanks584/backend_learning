@@ -1,13 +1,13 @@
-// require('dotenv').config({path:'./env'})
+
+// require() kaam nahi karta ES Modules mein — isliye comment kar diya
 
 import dotenv from 'dotenv'
 // in dono ko use nahi karte to nahi likha 
 // import mongoose from "mongoose"
 // import { DB_NAME } from "./constants";
-
-import express from "express"
+import { app } from "./app.js";
 import connectDB from "./db/index.js";
-
+t
 dotenv.config({
     path: './.env'
 })
@@ -31,8 +31,7 @@ connectDB()
 
 })
 .catch((error)=>{
-    console.log("daild")
-
+    console.log("MongoDB connection daild:", error)
 })
 
 
