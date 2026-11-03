@@ -7,7 +7,6 @@ import dotenv from 'dotenv'
 // import { DB_NAME } from "./constants";
 import { app } from "./app.js";
 import connectDB from "./db/index.js";
-t
 dotenv.config({
     path: './.env'
 })

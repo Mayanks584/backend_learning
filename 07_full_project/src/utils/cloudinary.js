@@ -14,8 +14,9 @@ file upload hogi to usko local server se remove kar dege
 
 
 */
-// cloud is custom same 
-import {v2 as cloud} from "cloudinary"
+// cloud is custom same - 'cloud' naam se import kiya tha par 'cloudinary' se use kar raha tha
+// FIX: consistent naam rakho - 'cloudinary' se import karo
+import {v2 as cloudinary} from "cloudinary"
 
 import fs from "fs"
 

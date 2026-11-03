@@ -22,7 +22,9 @@ app.use(cors({
 
 // json accept karni or uskii kitni limiy
 
-app.use(express.json({limit: "20kb"}))
+// app.use(express.json({limit: "20kb"}))
+
+app.use(express.json());
 
 /*
 
