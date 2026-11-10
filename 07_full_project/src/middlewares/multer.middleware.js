@@ -10,12 +10,13 @@ import multer from "multer"
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "./pulic/temp")
+    console.log(">>> [DEBUG] Multer destination called for file:", file.originalname);
+    cb(null, "./public/temp")
   },
   filename: function (req, file, cb) {
- // original ko change karna to dekh li 
-      cb(null, file.originalname)
-    }
+    console.log(">>> [DEBUG] Multer filename called for file:", file.originalname);
+    cb(null, file.originalname)
+  }
   
 })
 

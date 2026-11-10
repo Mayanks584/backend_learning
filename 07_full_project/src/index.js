@@ -7,6 +7,8 @@ import dotenv from 'dotenv'
 // import { DB_NAME } from "./constants";
 import { app } from "./app.js";
 import connectDB from "./db/index.js";
+import http from "http";
+
 dotenv.config({
     path: './.env'
 })
@@ -24,8 +26,19 @@ connectDB()
         throw error
     })
     
-    app.listen(process.env.PORT || 8000 , () =>{
-        console.log('server is runing')
+    const port = process.env.PORT || 8000;
+    const server = http.createServer(app);
+
+    server.on('connection', (socket) => {
+        console.log('>>> [DEBUG] New TCP connection from:', socket.remoteAddress);
+    });
+
+    server.on('request', (req, res) => {
+        console.log('>>> [DEBUG] HTTP request received at server level:', req.method, req.url);
+    });
+
+    server.listen(port, '0.0.0.0', () =>{
+        console.log(`server is runing on http://localhost:${port}`)
     })
 
 })

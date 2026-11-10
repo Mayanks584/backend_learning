@@ -60,8 +60,6 @@ form , url , json
 
 const { fullName, email, username, password } = req.body
 
-console.log("email:", email);
-
 /*
 ik method ye ki har kisi ke liye if else likho email ke liye bhi
 username name ke liye bhi etc etc 
@@ -103,7 +101,10 @@ if(existUser){
 
 const avatarlocalpath = req.files?.avatar[0]?.path;
 
-const coverlocalpath =  req.files?.coverImage[0]?.path;
+let coverlocalpath;
+if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
+    coverlocalpath = req.files.coverImage[0].path;
+}
 
 if(!avatarlocalpath){
     throw new ApiError(400,"avatar file is required");
@@ -111,12 +112,13 @@ if(!avatarlocalpath){
 
 
 const a = await uploadoncloudinary(avatarlocalpath);
-const c = await uploadoncloudinary(coverlocalpath);
 
 // avatar cloudinary pe upload hua ya nahi check karo
 if(!a){
     throw new ApiError(400, "avatar upload failed on cloudinary")
 }
+
+const c = await uploadoncloudinary(coverlocalpath);
 
 
 // database me entry

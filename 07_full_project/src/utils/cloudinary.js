@@ -59,6 +59,9 @@ const uploadoncloudinary = async (localfilepath) =>{
 
             console.log(response);
 
+            if (fs.existsSync(localfilepath)) {
+                fs.unlinkSync(localfilepath);
+            }
 
             // why we return response 
 
@@ -66,18 +69,16 @@ const uploadoncloudinary = async (localfilepath) =>{
 
     }
     catch(error){
-
+        console.error("Cloudinary upload error:", error);
         // see agar vo cloudinary pe upload nahi hui hai par vo apne server 
         // pe to hogi to usko bhi remove karna pdega
 
         // unlinksync lga ke  - reomve the loaclly saved tempory file as the upload operation fail
-
-        fs.unlinkSync(localfilepath)
+        if (fs.existsSync(localfilepath)) {
+            fs.unlinkSync(localfilepath);
+        }
 
         return null;
-
-
-
     }
 }
 

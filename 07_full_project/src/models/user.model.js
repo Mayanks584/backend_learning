@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema(
             index:true
 
         },
-         fullname:{
+         fullName:{
             type:String,
             required:true,
             trim:true,
@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema(
         avatar:{
             type:String,
             // cloudinary url ka use karege yaha ppe
-            require: true
+            required: true
         },
         coverImage:{
               type:String,
@@ -71,7 +71,7 @@ const userSchema = new mongoose.Schema(
 
 // jo mera save hai ye meri state hai to ik bar check kar lio jake mongoose ki docuemntatuon pe 
 
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
     /*
     dekh isme ik issue hai jab bhi main koi bhi save operation lgauga to 
      vo har bar isko password ko acess kar ke store karta rahega
@@ -85,7 +85,7 @@ userSchema.pre("save", async function (next) {
     if(this.isModified("password")){
          this.password = await bcrypt.hash(this.password,10)
     }
-    next()
+    // Mongoose 9 mein async function ke saath next() ki zaroorat nahi — promise auto-resolve hota hai
 
     // now we are checking ki password sahi hai ya nahi hai 
 
@@ -119,7 +119,7 @@ userSchema.methods.generateAccessToken = function (){
         _id:this._id,
         email:this.email,
         username:this.username,
-        fullname:this.fullname
+        fullName:this.fullName
         // payload : mere database se a rahi hai 
     },
     process.env.ACCESS_TOKEN_SECRET,
