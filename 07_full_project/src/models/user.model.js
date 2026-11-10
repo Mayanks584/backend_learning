@@ -71,9 +71,11 @@ const userSchema = new mongoose.Schema(
 
 // jo mera save hai ye meri state hai to ik bar check kar lio jake mongoose ki docuemntatuon pe 
 
+// pre hokke - one after anyhoer
 userSchema.pre("save", async function () {
     /*
     dekh isme ik issue hai jab bhi main koi bhi save operation lgauga to 
+
      vo har bar isko password ko acess kar ke store karta rahega
      maltab maine change profile kari ye tab bhi passwrd ko bhi acess kar lega
     this.password = bcrypt.hash(this.password,10)
@@ -157,5 +159,36 @@ ye sab kuch encrypt  kaise karege or -: mongoose ke  pre hook ki
 hook kya hote hai ye nahi pta 
 
 pre middleware dekh lena jake 
+
+*/
+/*
+
+
+refresh token vs acess token 
+
+acess token - short live expirese 
+
+acess token use in authentication 
+
+user ko validate acess token se hi karte hai
+ 
+
+
+refresh token - long live  expries
+
+also save in database and also given to the user 
+
+refresh token se end point hint kar ke vo usko ik naya acess token de deta ahi 
+
+
+
+
+
+
+
+
+
+
+
 
 */

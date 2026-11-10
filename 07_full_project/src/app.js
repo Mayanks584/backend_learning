@@ -4,6 +4,8 @@ import cors from 'cors'
 
 import cookieParser from "cookie-parser"
 
+import jwt from "jsonwebtoken"
+
 const app = express()
 
 // DEBUG: Log every incoming request
@@ -60,7 +62,7 @@ console.log(">>> [DEBUG] express.urlencoded() middleware registered");
 */
 app.use(express.static("public"))
 
-
+// this is middleware and we are giving the cookies acess to it 
 app.use(cookieParser())
 
 // routers code 

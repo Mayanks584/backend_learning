@@ -12,6 +12,31 @@ import { uploadoncloudinary } from "../utils/cloudinary.js"
 
 import {apiresponse} from "../utils/apiresp.js"
 
+
+// we are making a method to generate acess and refresh token 
+
+const acessandrefreshToken = async(userId)=>
+    {
+    try{
+
+      const user =  await User.findById(userId)
+     const acces =  user.generateAccessToken()
+     const  refresh =  user.generateRefreshToken()
+
+        user.refreshToken= refresh  
+
+        // validatebeforesave is a function in mongoose ki mujhe pta hai ki main kya kar rha hu 
+        // to tum validation check mat karo 
+
+      await user.save({validateBeforeSave:false})
+
+      return {acces,refresh}
+
+    }
+    catch(error){
+        throw new ApiError(500,"Somethinf went wrong while generating token ")
+    }
+}
 const register = asyncHandler( async (req, res) => {
 
     //     res.status(200).json({
@@ -162,6 +187,164 @@ return res.status(201).json(
 
 // ye method kab run karega usko btane ke liye hum routes bnate hai 
 
+
+const loginUser = asyncHandler(async (req,res)=>{
+
+/*
+
+step one - req body ise data le ao 
+
+step two email password chahiye (apni marzi username ya emaol )
+
+find the user 
+
+password hai ko bycrpt kiya hai usko match karna hai 
+
+
+
+fir usko ko ik refresh y acess token de dene hoge 
+
+send cookies
+
+
+*/
+
+const {email,username,password} = req.body
+
+if(!username && !email){
+    throw new ApiError(400,"username or email is required")
+}
+
+
+const user = await User.findOne({
+    $or:[{username},{email}]
+})
+
+if(!user){
+    throw new ApiError(400,"user not exist")
+}
+
+
+ /*
+
+so jo findone or etc etc hai vo sare mere mongodb ke built in functinhai 
+
+jo maine aese user model me bnaye hai vo mere function hai to miane aese jo const user bnaya hai
+
+ispe main use kar sakta hu sare 
+
+
+
+
+ */
+
+//  ik bar ye wala code smajhi 
+
+const passwordvalide = await user.isPasswordCorrect(password)
+
+if(!passwordvalide){
+    throw new ApiError(401,"password is wrong")
+}
+
+    /*
+
+    jo mera user hai usme mera refreshtoken abhi tak updated nahihai 
+
+    maine jab ye niche wala function call kiya uske bad bhi nahi hoafa 
+
+    uske liye mujhe ik queery likhni hai or vo mere pe hai likhni hai ya nahi 
+
+    ya mere pe itna paisa hai ki ik or db call kar sakta hu kya nahi 
+
+
+
+    */
+
+  const {acces,refresh} = await acessandrefreshToken(user._id)
+
+  
+
+    const loginuser=await User.findById(user._id).select("-password -refreshToken")
+
+    // / know we are sending cookies 
+    /*
+
+    when we are sending cookies we have option what we have to send 
+
+    */
+
+    const options = {
+        httpOnly:true,
+        secure:true
+    }
+
+    return res.
+    status(200)
+    .cookie("acesstoken",acces,options)
+    .cookie("refreshtoken",refresh,options)
+    .json(
+        new apiresponse(
+            200,
+            {
+                user:loginuser,acesstoken:acces,refreshtoken:refresh
+            },
+            "user logged in sucessfully"
+        )
+    )
+
+
+
+})
+
+
+const logoutUser = asyncHandler(async(req,res)=>{
+    /*
+
+    remove cookie 
+
+    remove refresh token 
+
+
+    we alos can make our middleware 
+
+    */
+
+    await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $unset: {
+                refreshToken: 1
+            }
+        },
+        {
+            new: true
+        }
+
+    )
+
+    
+
+    return res
+    .status(200)
+    .clearCookie("acesstoken", options)
+    .clearCookie("refreshtoken", options)
+    .json(new apiresponse(200, {}, "user logged out successfully"))
+    const options = {
+        httpOnly:true,
+        secure:true
+    }
+
+    return resp
+})
+
+
+
+
+
+
 export {
     register,
+    loginUser,
+    logoutUser
+
 }
