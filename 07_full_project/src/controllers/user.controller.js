@@ -12,7 +12,7 @@ import { uploadoncloudinary } from "../utils/cloudinary.js"
 
 import {apiresponse} from "../utils/apiresp.js"
 
-
+import jwt from "jsonwebtoken"
 // we are making a method to generate acess and refresh token 
 
 const acessandrefreshToken = async(userId)=>
@@ -211,9 +211,22 @@ send cookies
 
 const {email,username,password} = req.body
 
+// ye jab hum dono hi chahiey 
 if(!username && !email){
     throw new ApiError(400,"username or email is required")
 }
+
+
+/*
+
+ye jab hum ko dono me se ik chahiye 
+
+ if(!(username && email)){
+    throw new ApiError(400,"username or email is required")
+}
+
+
+*/
 
 
 const user = await User.findOne({
@@ -324,23 +337,81 @@ const logoutUser = asyncHandler(async(req,res)=>{
 
     
 
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
     return res
     .status(200)
     .clearCookie("acesstoken", options)
     .clearCookie("refreshtoken", options)
     .json(new apiresponse(200, {}, "user logged out successfully"))
+})
+
+/*
+
+here we are making a endpont for our acress token jab bhi  vo khtam ho jaye 
+
+to refresh token ka endpoint hint kar  ke vo naya session start kar paye 
+
+
+
+*/
+
+const refreshAcessToken = asyncHandler (async(req,res)=>{
+    const incomingrefreshtoken =  req.cookie.refreshToken || req.body.refreshToken
+
+    if(!incomingrefreshtoken){
+        throw new  ApiError(401,"unauthorized request")
+    }
+
+    
+  const decodedtoken = jwt.verify(
+        incomingrefreshtoken,process.env.REFRESH_TOKEN_SECRET
+    )
+
+    // usermidel me jo generaterefreshtiken hia uske andar id passs hi hia wohi use kar rahe hai yaah
+
+    const user = await  User.findById(decodedtoken?._id)
+    if(!user){
+        throw new  ApiError(401,"unauthorized request")
+    }
+
+    // do token aya hia mere pe incoming - jo user bhej raha ahi user me jo databse me ahi 
+
+
+    if(incomingrefreshtoken !== user?.refreshToken){
+        throw new  ApiError(401,"refresh token is expire")
+    }
+
     const options = {
         httpOnly:true,
         secure:true
     }
 
-    return resp
+     const {access,refreshs} =await acessandrefreshToken(user._id)
+
+     return res
+     .status(200)
+    .cookie("acesstoken", access,options)
+    .cookie("refreshtoken", refreshs.options)
+
+    .json(
+        new apiresponse(
+            200,
+            {
+                access,refreshs:refreshs
+            },
+            "Acess token refresh"
+        )
+    )
+
+
 })
 
 
-
-
-
+// payload ??
 
 export {
     register,

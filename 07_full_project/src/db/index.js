@@ -1,6 +1,13 @@
 import mongoose  from "mongoose";
-
+import dns from "node:dns";
 import { DB_NAME } from "../constants.js";
+//
+ // Force Node to use reliable DNS servers (Google DNS) for SRV queries
+// try {
+//     dns.setServers(['8.8.8.8', '8.8.4.4']);
+// } catch (e) {
+//     // Ignore if restricted
+// }
 
 const connectDB = async () => {
     try{
