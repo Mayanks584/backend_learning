@@ -360,54 +360,55 @@ to refresh token ka endpoint hint kar  ke vo naya session start kar paye
 */
 
 const refreshAcessToken = asyncHandler (async(req,res)=>{
-    const incomingrefreshtoken =  req.cookie.refreshToken || req.body.refreshToken
+    const incomingrefreshtoken = req.cookies?.refreshtoken || req.cookies?.refreshToken || req.body?.refreshToken
 
     if(!incomingrefreshtoken){
         throw new  ApiError(401,"unauthorized request")
     }
 
-    
-  const decodedtoken = jwt.verify(
-        incomingrefreshtoken,process.env.REFRESH_TOKEN_SECRET
-    )
-
-    // usermidel me jo generaterefreshtiken hia uske andar id passs hi hia wohi use kar rahe hai yaah
-
-    const user = await  User.findById(decodedtoken?._id)
-    if(!user){
-        throw new  ApiError(401,"unauthorized request")
-    }
-
-    // do token aya hia mere pe incoming - jo user bhej raha ahi user me jo databse me ahi 
-
-
-    if(incomingrefreshtoken !== user?.refreshToken){
-        throw new  ApiError(401,"refresh token is expire")
-    }
-
-    const options = {
-        httpOnly:true,
-        secure:true
-    }
-
-     const {access,refreshs} =await acessandrefreshToken(user._id)
-
-     return res
-     .status(200)
-    .cookie("acesstoken", access,options)
-    .cookie("refreshtoken", refreshs.options)
-
-    .json(
-        new apiresponse(
-            200,
-            {
-                access,refreshs:refreshs
-            },
-            "Acess token refresh"
+    try {
+        const decodedtoken = jwt.verify(
+            incomingrefreshtoken,process.env.REFRESH_TOKEN_SECRET
         )
-    )
+
+        // usermidel me jo generaterefreshtiken hia uske andar id passs hi hia wohi use kar rahe hai yaah
+
+        const user = await  User.findById(decodedtoken?._id)
+        if(!user){
+            throw new  ApiError(401,"unauthorized request")
+        }
+
+        // do token aya hia mere pe incoming - jo user bhej raha ahi user me jo databse me ahi 
 
 
+        if(incomingrefreshtoken !== user?.refreshToken){
+            throw new  ApiError(401,"refresh token is expire")
+        }
+
+        const options = {
+            httpOnly:true,
+            secure:true
+        }
+
+        const {acces, refresh} = await acessandrefreshToken(user._id)
+
+        return res
+        .status(200)
+        .cookie("acesstoken", acces, options)
+        .cookie("refreshtoken", refresh, options)
+        .json(
+            new apiresponse(
+                200,
+                {
+                    acesstoken: acces,
+                    refreshtoken: refresh
+                },
+                "Acess token refresh"
+            )
+        )
+    } catch (error) {
+        throw new ApiError(401, error?.message || "invalid refresh token")
+    }
 })
 
 
@@ -416,6 +417,6 @@ const refreshAcessToken = asyncHandler (async(req,res)=>{
 export {
     register,
     loginUser,
-    logoutUser
-
+    logoutUser,
+    refreshAcessToken
 }
