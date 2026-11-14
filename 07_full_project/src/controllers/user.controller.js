@@ -231,7 +231,7 @@ send cookies
 const {email,username,password} = req.body
 
 // ye jab hum dono hi chahiey 
-if(!username && !email){
+if(!username && !email){ 
     throw new ApiError(400,"username or email is required")
 }
 
@@ -255,7 +255,7 @@ const user = await User.findOne({
 if(!user){
     throw new ApiError(400,"user not exist")
 }
-
+ 
 
  /*
 
@@ -430,6 +430,309 @@ const refreshAcessToken = asyncHandler (async(req,res)=>{
     }
 })
 
+/*
+
+make by me bitch
+
+isme dikkat hai niche sir wala logout hai 
+
+const forgetpassword = asyncHandler(async(req,res)=>{
+    
+    step one 
+
+
+    find karo usko emial hai bhi hai anhi
+
+    vo user exist bhi karta hai ya nahi 
+
+    
+
+    const {username,email} = req.body
+
+    mongodb ki query hamesha ({}) aese
+
+    const userexit = await User.findOne({email})
+
+    if(!userexit){
+        throw new ApiError(404,"user is not found")
+    }
+
+    
+
+    ik naya page open hoga isme vo naya password dalega
+
+    mujhe vo lena hai or usko replace karna hai simple 
+
+
+    
+
+    const newpassword = req.body?.password
+
+    if(newpassword===""){
+        throw new ApiError(400,"fill the password")
+    }
+
+    
+
+    ab mere pass new password bhi hai or yaha password bhi hai 
+
+
+    
+    
+   // ye mera bas javascript me save hoga nah ki mongodb me 
+
+     // req.body.password = newpassword
+
+     const user = await User.findOne({email})
+
+     user.password = newpassword
+
+     await user.save()
+
+return res.status(200).json(
+        new apiresponse(
+            200,
+            {},
+            "Password changed successfully"
+        )
+    );
+
+
+})
+
+*/
+
+const changeCurrentPassword = asyncHandler(async(req,res)=>{
+    const {oldpassword,newpassword} = req.body
+
+    /*
+
+    so sir basically user login hai or vo fir password change kar raha hai 
+
+    to jab user ne login kiya hai to auth middleware chala hai or us user ki sari 
+
+    detail us user pe hogi to waha se data le lena 
+
+
+    */
+
+   const user = await User.findById(req.user?._id)
+
+   // jo bhi mere async function hoge unpe await lagta hai 
+
+
+   /*
+
+    so basically miane user model me isPasswordCorrect bnaya tha vo call kiya 
+
+    or user me sari value thi user ki to dono ko compare kar diya 
+
+
+   */
+   const isPasswordCorrect = await user.isPasswordCorrect(oldpassword)
+    
+
+   if(!isPasswordCorrect){
+    throw new ApiError(400,"invalid old password")
+   }
+
+   user.password = newpassword
+
+   await user.save({validateBeforeSave:false})
+
+   return res.status(200).json(
+    new apiresponse(200,{},"password is changes sucessfully")
+   )
+})
+
+const getCurrentuser = asyncHandler(async(req,res)=>{
+    return res.status(200).json(
+        200,req.user,"current user fetched successfully"
+    )
+})
+
+const forgetpassword = asyncHandler(async(req,res)=>{
+
+    
+
+    const {username,email} = req.body
+
+
+
+    const userexit = await User.findOne({email})
+
+    if(!userexit){
+        throw new ApiError(404,"user is not found")
+    }
+
+    
+
+
+
+    
+
+    const newpassword = req.body?.password
+
+    if(newpassword===""){
+        throw new ApiError(400,"fill the password")
+    }
+
+    
+
+
+
+    
+    
+   // ye mera bas javascript me save hoga nah ki mongodb me 
+
+     // req.body.password = newpassword
+
+     const user = await User.findOne({email})
+
+     user.password = newpassword
+
+     await user.save()
+
+return res.status(200).json(
+        new apiresponse(
+            200,
+            {},
+            "Password changed successfully"
+        )
+    );
+
+
+})
+
+// file update karte time uske alag endpoint rakhna 
+
+const updateAccountDetails=asyncHandler(async(req,res)=>{
+
+    const{fullName,email}=req.body
+
+    if(!fullName || !email){
+        throw new ApiError(400,"all fileds are reqired")
+    }
+
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            // set hai vo recive karta hai ik object 
+
+            // dono kar sakte hai 
+
+            $set:{
+                fullName,
+                email:email
+            }
+        },
+        {new:true}
+    
+    
+    
+    ).select("-password")
+
+
+
+    return res.status(200).json(
+        new apiresponse(200,user,"account detail updated sucessfully")
+    )
+
+
+
+
+})
+
+const updateuseravatar = asyncHandler(async(req,res)=>{
+
+    const avatarlocalpath = req.file?.path
+
+    // const user = await User.findByIdAndUpdate(
+    //     req.file?.path,
+    //     {
+    //    $set:{
+    //         avatar:avatar
+    //     },
+    // },
+    // {new:true}
+    // ).select("-password")
+
+    if(!avatarlocalpath){
+        throw new ApiError(400,"avatar file is missing")
+    }
+
+   const avatar= await uploadoncloudinary(avatarlocalpath)
+
+   if(!avatar.url){
+    throw new ApiError(400,"error while upldaing on avatar")
+   }
+
+   await User.findByIdAndUpdate(
+    
+        req.user?._id,
+        {
+            $set:{
+                avatar:avatar.url
+            }
+
+
+        },
+        {
+            new:true
+        }
+    
+   ).select("-password")
+
+    return res.status(200).json(
+        new apiresponse(200,user,"avatar is changed")
+    )
+})
+
+const updateusercoverimage = asyncHandler(async(req,res)=>{
+
+    const coverImagepath = req.file?.path
+
+    // const user = await User.findByIdAndUpdate(
+    //     req.file?.path,
+    //     {
+    //    $set:{
+    //         avatar:avatar
+    //     },
+    // },
+    // {new:true}
+    // ).select("-password")
+
+    if(!coverImagepath){
+        throw new ApiError(400,"cover umage file is missing")
+    }
+
+   const coverImage= await uploadoncloudinary(coverImagepath)
+
+   if(!coverImage.url){
+    throw new ApiError(400,"error while upldaing")
+   }
+
+   const user = await User.findByIdAndUpdate(
+    
+        req.user?._id,
+        {
+            $set:{
+                coverImage:coverImage.url
+            }
+
+
+        },
+        {
+            new:true
+        }
+    
+   ).select("-password")
+
+    return res.status(200).json(
+        new apiresponse(200,user,"coverimage  is changed")
+    )
+})
+
 
 // payload ??
 
@@ -437,5 +740,13 @@ export {
     register,
     loginUser,
     logoutUser,
-    refreshAcessToken
+    refreshAcessToken,
+    changeCurrentPassword,
+    getCurrentuser,
+    forgetpassword,
+    updateAccountDetails,
+    updateuseravatar,
+    updateusercoverimage
+
+
 }

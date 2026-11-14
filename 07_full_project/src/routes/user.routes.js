@@ -2,7 +2,11 @@
 
 
 import { Router } from "express";
-import { loginUser, logoutUser, register, refreshAcessToken } from "../controllers/user.controller.js";
+
+import { loginUser, logoutUser, register, refreshAcessToken,changeCurrentPassword,getCurrentuser,forgetpassword,
+    updateAccountDetails,updateuseravatar,updateusercoverimage
+
+} from "../controllers/user.controller.js";
 
 import {upload} from "../middlewares/multer.middleware.js"
 
@@ -37,6 +41,12 @@ router.route("/login").post(loginUser)
 router.route("/logout").post(verfiyJWT,logoutUser)
 
 router.route("/refresh-token").post(refreshAcessToken)
+
+ router.route("/changeCurrentPassword").post(changeCurrentPassword)
+
+ router.route("/getCurrentuser").get(getCurrentuser)
+
+ router.route("/forgetpassword").post(forgetpassword)
 
 export default router
 
