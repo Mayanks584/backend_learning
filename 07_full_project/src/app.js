@@ -63,6 +63,7 @@ console.log(">>> [DEBUG] express.urlencoded() middleware registered");
 app.use(express.static("public"))
 
 // this is middleware and we are giving the cookies acess to it 
+
 app.use(cookieParser())
 
 // routers code 

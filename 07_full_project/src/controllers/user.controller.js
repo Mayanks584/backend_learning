@@ -3,6 +3,7 @@ import { asyncHandler } from "../utils/asysnchandler.js"
 import { ApiError } from "../utils/apierror.js";
 
 // export dekh li konsa nam hai wohi likhna hai
+
 // User model default export hai isliye {} nahi lagate
 import User from "../models/user.model.js"
 
@@ -83,6 +84,14 @@ form , url , json
 
 */
 
+/*
+
+Object destructuring takes (extracts) data from an existing object. 
+
+It does not give or send data to that object.
+
+*/
+
 const { fullName, email, username, password } = req.body
 
 /*
@@ -101,6 +110,16 @@ if(fullName == " "){
 
 // second method
 
+// .some - Its job is to check whether at least one element in an array satisfies a given condition.
+
+
+/*
+
+Jab tum kisi property ko access kar rahe ho aur possibility hai ki uske parent 
+
+ki value undefined ya null ho, tab ?. use karte hain.
+
+*/
 if(
     [fullName,email,username,password].some((field) => field?.trim() === "")
 ){
